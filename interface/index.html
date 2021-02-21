@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Chess</title>
+
+  <link rel="stylesheet" href="css/chessboard-1.0.0.min.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="js/chessboard-1.0.0.min.js"></script>
+</head>
+
+<body>
+  <div id="board1" style="width: 400px"></div>
+  <canvas id="bar-chart" width="800" height="450"></canvas>
+  <p id="currentMove"></p>
+  <p id="nextMoves"></p>
+  <script>
+    var board1 = ChessBoard('board1', 'start');
+  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="node_modules/chart.js/dist/Chart.js"></script>
+  <script>
+
+    var chart;
+
+    function createChart() {
+      chart = new Chart(document.getElementById("bar-chart"), {
+        type: 'bar',
+        data: {
+          labels: ["a"],
+          datasets: [
+            {
+              data: [0],
+              backgroundColor: 'rgba(150,150,150)'
+            }
+          ]
+        },
+        options: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Moves'
+          }
+        }
+      });
+    }
+
+    function updateChartLabels(listeMoves) {
+      chart.data.labels = listeMoves;
+      chart.update();
+    }
+
+    function updateData(data) {
+      chart.data.datasets[0].data = data;
+      chart.update();
+    }
+
+    createChart();
+
+    var socket = io();
+
+    socket.on('makeMove', function (move) {
+      var lastMoveLabel = document.getElementById("currentMove");
+
+      lastMoveLabel.innerText = "Last move : " + move;
+
+      board1.move(move);
+    });
+
+    socket.on('sendListMoves', function (moves) {
+      var nextMovesLabel = document.getElementById("nextMoves");
+      let nextMovesString = "Moves possible : " + moves.join(" - ");
+      nextMovesLabel.innerText = nextMovesString;
+
+      updateChartLabels(moves);
+    });
+
+    socket.on('sendGraphData', function (moves) {
+      updateData(moves);
+    });
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "socket-twitch-chess",
+  "version": "0.0.1",
+  "description": "Twitch plays chess",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "events": "^3.2.0",
+    "express": "^4.17.1",
+    "socket.io": "^3.1.1"
+  }
+}
